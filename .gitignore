@@ -1,0 +1,12 @@
+# Logs
+logs
+*.log
+
+/xml_files/*
+/Стандартные изделия/*
+
+node_modules
+
+.idea
+
+test*
