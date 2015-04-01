@@ -1,4 +1,4 @@
-exports.parseXML = function(xmlFileName) {
+var parseXML = function (xmlFileName, callback, pathCSV) {
 
     var fs = require('fs'),
         flow = require('xml-flow'),
@@ -196,13 +196,16 @@ exports.parseXML = function(xmlFileName) {
     }
 
     xmlStream.on('tag:item', function(item) {
-        console.log("=============================");
-        console.log(item);
-        console.log("#############################");
-        //console.log(item.items[1].description)
+        //console.log("=============================");
+        //console.log(item);
+        //console.log("#############################");
 
         parse_item(item, tabs, ++counter, 0);
         printAllElementsSB();
+        callback(el, pathCSV);
     });
 
 }
+
+
+exports.parseXML = parseXML;

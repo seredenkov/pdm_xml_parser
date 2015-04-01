@@ -3,6 +3,7 @@
 
 var parser1 = require('./pdm_xml1-sb');
 var parser2 = require('./pdm_xml2-sb');
+var exportToCSV = require('./export_to_CSV');
 
 
 var xmlFileName;
@@ -31,4 +32,4 @@ xmlFileName = "../xml_files/КСЦ50.01.100 Опора.xml";
 
 //xmlFileName =  '../xml_files/КСЦ 450 (29.01.2015).xml'
 //parser1.parseXML(xmlFileName);
-parser2.parseXML(xmlFileName);
+parser2.parseXML(xmlFileName, exportToCSV, "D:/elements.csv");
