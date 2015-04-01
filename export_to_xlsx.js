@@ -8,13 +8,33 @@ module.exports = function(elements, pathToXLS) {
         fs = require('fs'),
         data = [], xlsData;
 
+    function checkNameSB(name) {
+
+        if (name && name.length > 3) {
+            if (name.substr(-3) === ' СБ') {
+                name = name.substr(0, name.length - 3);
+            }
+        }
+        return name;
+    }
+
+    function checkTypeEl(elType) {
+        var types = {
+            'Деталь': 1,
+            'Прочее изделие': 3,
+            'Стандартное покупное изделие': 2,
+            'Узел/Сборка': 0
+        };
+
+        return types[elType];
+    }
 
     elements.forEach( function(element) {
         var idEl = element.id,
             allSB = [],
             allDT = [];
 
-        if (element.elementType == 'Узел/Сборка') {
+        if (element.elementType === 'Узел/Сборка') {
             // из перечня элементов выбираются сборочные еденицы, и наполняются элементами у которых текущая сборка является родителем
             allSB[idEl] = {};
             allSB[idEl].el = element;
@@ -37,9 +57,9 @@ module.exports = function(elements, pathToXLS) {
 
         // в массив input помещаются данные для экспорта в CSV
         allSB.forEach(function (elSB) {
-            data.push([ elSB.el.props['Обозначение'], elSB.el.props['Наименование'] ]);
+            data.push([ checkNameSB(elSB.el.props['Обозначение']), elSB.el.props['Наименование'] ]);
             elSB.sb.forEach(function (element) {
-                data.push([ '','',  element.props['Обозначение'], element.props['Наименование'], element.props['Количество'], '', '', '', element.elementType ])
+                data.push([ '','',  checkNameSB(element.props['Обозначение']), element.props['Наименование'], parseFloat(element.props['Количество']), '', '', '', '', checkTypeEl(element.elementType) ])
             })
         });
 

@@ -19,9 +19,9 @@ var xmlFileName;
 //xmlFileName = "../xml_files/ЗС1175.04.00.000 СБ Модуль верхний (04.03.2015).xml";
 //xmlFileName = "../xml_files/ЗС1175.04.00.000 СБ Модуль верхний (26.02.2015).xml";
 //xmlFileName = "../xml_files/ЗС975 часть (05.03.2015).xml";
-//xmlFileName = "../xml_files/КСЦ 450 (29.01.2015).xml";
+xmlFileName = "../xml_files/КСЦ 450 (29.01.2015).xml";
 //xmlFileName = "../xml_files/КСЦ50.00.000 Конвейер скребковый цепной (27.08.2014).xml";
-xmlFileName = "../xml_files/КСЦ50.01.100 Опора.xml";
+//xmlFileName = "../xml_files/КСЦ50.01.100 Опора.xml";
 //xmlFileName = "../xml_files/Материалы (03.11.2013).xml";
 //xmlFileName = '../xml_files/ЗC975.00.00.000 СБ.xml';
 
@@ -35,3 +35,4 @@ xmlFileName = "../xml_files/КСЦ50.01.100 Опора.xml";
 //parser1.parseXML(xmlFileName);
 //parser2.parseXML(xmlFileName, exportToCSV, "D:/elements.csv");
 parser2.parseXML(xmlFileName, exportToXLSX, "D:/elements.xlsx");
+//parser2.parseXML(xmlFileName, function() { console.log}, "D:/elements.xlsx");
