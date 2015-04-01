@@ -1,12 +1,12 @@
 "use strict";
-module.exports = function(elements, pathToCSV) {
+module.exports = function(elements, pathToXLS) {
 
     // Модуль получает массив объектов представляющий из себя элементы (сборочные узлы, детали, ..)
     // И экспортирует данные в CSV файл для обработки в excel
 
-    var stringify = require('csv-stringify'),
+    var xlsx = require('node-xlsx'),
         fs = require('fs'),
-        input = [];
+        data = [], xlsData;
 
 
     elements.forEach( function(element) {
@@ -37,20 +37,22 @@ module.exports = function(elements, pathToCSV) {
 
         // в массив input помещаются данные для экспорта в CSV
         allSB.forEach(function (elSB) {
-            input.push([ elSB.el.props['Обозначение'], elSB.el.props['Наименование'] ]);
+            data.push([ elSB.el.props['Обозначение'], elSB.el.props['Наименование'] ]);
             elSB.sb.forEach(function (element) {
-                input.push([ '','',  element.props['Обозначение'], element.props['Наименование'], element.props['Количество'], '', '', '', element.elementType ])
+                data.push([ '','',  element.props['Обозначение'], element.props['Наименование'], element.props['Количество'], '', '', '', element.elementType ])
             })
         });
+
     });
 
-    stringify(input, function(err, output){
-        console.log(output);
-        fs.writeFile(pathToCSV, output, 'utf-8', function(err) {
-            if(err) {
-                return console.log(err);
-            }
-            console.log("The file was saved!");
-        });
+    xlsData = xlsx.build([{name: "shtData", data: data}]); // returns a buffer
+
+    var pathToXLS = pathToXLS;
+    fs.writeFile(pathToXLS, xlsData, 'utf-8', function(err) {
+        if(err) {
+            return console.log(err);
+        }
+        console.log("The file was saved!");
     });
+
 };
