@@ -8,6 +8,23 @@ module.exports = function(elements, pathToXLS) {
         fs = require('fs'),
         data = [], xlsData;
 
+    // Проверка типа элемента.
+    // В массиве указаны элементы, которые должны входить в сборку изделия экспортируемую в Excel
+    function chekTypesForSB (str) {
+        var typesForSB = [
+                'Деталь',
+                'Узел/Сборка',
+                'Материал',
+                'Прочее изделие',
+                'Стандартное покупное изделие'];
+
+        for (var i = 0, l = typesForSB.length; i < l; i++) {
+            if (typesForSB[i] == str) {
+                return true;
+            }
+        }
+        return false;
+    }
     function checkNameSB(name) {
 
         if (name && name.length > 3) {
@@ -39,12 +56,7 @@ module.exports = function(elements, pathToXLS) {
             allSB[idEl] = {};
             allSB[idEl].el = element;
             allSB[idEl].sb = elements.filter(function (element) {
-                return (element.parentID === idEl &&
-                    (element.elementType === 'Деталь' ||
-                        element.elementType === 'Узел/Сборка' ||
-                        element.elementType === 'Материал' ||
-                        element.elementType === 'Прочее изделие' ||
-                        element.elementType === 'Стандартное покупное изделие'));
+                return (element.parentID === idEl && chekTypesForSB(element.elementType));
             });
         } else if (element.elementType == 'Деталь') {
             // формируется массив деталей
@@ -59,7 +71,8 @@ module.exports = function(elements, pathToXLS) {
         allSB.forEach(function (elSB) {
             data.push([ checkNameSB(elSB.el.props['Обозначение']), elSB.el.props['Наименование'] ]);
             elSB.sb.forEach(function (element) {
-                data.push([ '','',  checkNameSB(element.props['Обозначение']), element.props['Наименование'], parseFloat(element.props['Количество']), '', '', '', '', checkTypeEl(element.elementType) ])
+                data.push([ '','',  checkNameSB(element.props['Обозначение']), element.props['Наименование'],
+                    parseFloat(element.props['Количество']), '', '', '', '', checkTypeEl(element.elementType) ])
             })
         });
 
