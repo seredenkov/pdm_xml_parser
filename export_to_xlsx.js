@@ -6,25 +6,31 @@ module.exports = function(elements, pathToXLS) {
 
     var xlsx = require('node-xlsx'),
         fs = require('fs'),
-        data = [], xlsData;
+        data = [],
+        xlsData,
+        allSB = [],
+        allDT = [],
+        typesForSB = [],
+        typesOfElement = {};
 
-    // Проверка типа элемента.
-    // В массиве указаны элементы, которые должны входить в сборку изделия экспортируемую в Excel
-    function chekTypesForSB (str) {
-        var typesForSB = [
-                'Деталь',
-                'Узел/Сборка',
-                'Материал',
-                'Прочее изделие',
-                'Стандартное покупное изделие'];
+    // Типы элементов для сборочных едениц
+    // Изделия, чьи типы отличаются от перечисленных в экспортируемые сборочные еденицы не попадут
+    typesForSB = [
+        'Деталь',
+        'Узел/Сборка',
+        'Материал',
+        'Прочее изделие',
+        'Стандартное покупное изделие'];
 
-        for (var i = 0, l = typesForSB.length; i < l; i++) {
-            if (typesForSB[i] == str) {
-                return true;
-            }
-        }
-        return false;
-    }
+    // Объект с типами элементов и их ID в Excel
+    typesOfElement = {
+        'Деталь': 1,
+        'Прочее изделие': 3,
+        'Стандартное покупное изделие': 2,
+        'Узел/Сборка': 0
+    };
+
+    // Исправляет название сборочных едениц, если оно указано с символами " СБ"
     function checkNameSB(name) {
 
         if (name && name.length > 3) {
@@ -35,52 +41,38 @@ module.exports = function(elements, pathToXLS) {
         return name;
     }
 
-    function checkTypeEl(elType) {
-        var types = {
-            'Деталь': 1,
-            'Прочее изделие': 3,
-            'Стандартное покупное изделие': 2,
-            'Узел/Сборка': 0
-        };
-
-        return types[elType];
-    }
-
+    // массивы allSB[] и allDT[] наполняются перечнем позиций
     elements.forEach( function(element) {
-        var idEl = element.id,
-            allSB = [],
-            allDT = [];
+        var idEl = element.id;
 
         if (element.elementType === 'Узел/Сборка') {
             // из перечня элементов выбираются сборочные еденицы, и наполняются элементами у которых текущая сборка является родителем
             allSB[idEl] = {};
             allSB[idEl].el = element;
             allSB[idEl].sb = elements.filter(function (element) {
-                return (element.parentID === idEl && chekTypesForSB(element.elementType));
+                return (element.parentID === idEl && typesForSB.indexOf(element.elementType) != -1);
             });
         } else if (element.elementType == 'Деталь') {
             // формируется массив деталей
             allDT[idEl] = {};
             allDT[idEl].el = element;
             allDT[idEl].sb = elements.filter(function (element) {
-                return (element.parentID === idEl && element.elementType === 'Материал' );
+                return (element.parentID === idEl && element.elementType === 'Материал' );  // TODO: Деталь может быть не только из материала, а ещё из мтандартных и прочих изделий
             });
         }
+    });
 
-        // в массив input помещаются данные для экспорта в CSV
-        allSB.forEach(function (elSB) {
-            data.push([ checkNameSB(elSB.el.props['Обозначение']), elSB.el.props['Наименование'] ]);
-            elSB.sb.forEach(function (element) {
-                data.push([ '','',  checkNameSB(element.props['Обозначение']), element.props['Наименование'],
-                    parseFloat(element.props['Количество']), '', '', '', '', checkTypeEl(element.elementType) ])
-            })
-        });
-
+    // в массив data помещаются данные для экспорта в XLSX
+    allSB.forEach(function (elSB) {
+        data.push([ checkNameSB(elSB.el.props['Обозначение']), elSB.el.props['Наименование'] ]);
+        elSB.sb.forEach(function (element) {
+            data.push([ '','',  checkNameSB(element.props['Обозначение']), element.props['Наименование'],
+                parseFloat(element.props['Количество']), '', '', '', '', typesOfElement[element.elementType]  ]);
+        })
     });
 
     xlsData = xlsx.build([{name: "shtData", data: data}]); // returns a buffer
 
-    var pathToXLS = pathToXLS;
     fs.writeFile(pathToXLS, xlsData, 'utf-8', function(err) {
         if(err) {
             return console.log(err);
