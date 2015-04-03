@@ -41,24 +41,28 @@ module.exports = function(elements, pathToXLS) {
         return name;
     }
 
-    // массивы allSB[] и allDT[] наполняются перечнем позиций
+    // массивы allSB[] и allDT[] наполняются перечнем уникальных позиций
+    // TODO: перенести логику выбора только уникальных элементов из модуля формирующего XLSX в модуль парсинга XML
     elements.forEach( function(element) {
-        var idEl = element.id;
+        var idEl = element.id,
+            nweEl = {};
 
         if (element.elementType === 'Узел/Сборка') {
-            // из перечня элементов выбираются сборочные еденицы, и наполняются элементами у которых текущая сборка является родителем
-            allSB[idEl] = {};
-            allSB[idEl].el = element;
-            allSB[idEl].sb = elements.filter(function (element) {
-                return (element.parentID === idEl && typesForSB.indexOf(element.elementType) != -1);
-            });
+            if ( allSB.filter( function(elSB) { return  element.props['Обозначение'] == elSB.el.props['Обозначение'] }).length == 0) {
+                // из перечня элементов выбираются сборочные еденицы, и наполняются элементами у которых текущая сборка является родителем
+                nweEl.el = element;
+                nweEl.sb = elements.filter(function (element) {
+                    return (element.parentID === idEl && typesForSB.indexOf(element.elementType) != -1);
+                });
+                allSB.push(nweEl);
+            }
         } else if (element.elementType == 'Деталь') {
             // формируется массив деталей
-            allDT[idEl] = {};
-            allDT[idEl].el = element;
-            allDT[idEl].sb = elements.filter(function (element) {
+            nweEl.el = element;
+            nweEl.sb = elements.filter(function (element) {
                 return (element.parentID === idEl && element.elementType === 'Материал' );  // TODO: Деталь может быть не только из материала, а ещё из мтандартных и прочих изделий
             });
+            allDT.push(nweEl);
         }
     });
 
