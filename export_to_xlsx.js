@@ -68,7 +68,7 @@ module.exports = function(elements, pathToXLS) {
 
     // в массив data помещаются данные для экспорта в XLSX
     allSB.forEach(function (elSB) {
-        data.push([ checkNameSB(elSB.el.props['Обозначение']), elSB.el.props['Наименование'] ]);
+        data.push([ elSB.el.props['Наименование'], checkNameSB(elSB.el.props['Обозначение']) ]);
         elSB.sb.forEach(function (element) {
             data.push([ '','',  checkNameSB(element.props['Обозначение']), element.props['Наименование'],
                 parseFloat(element.props['Количество']), '', '', '', '', typesOfElement[element.elementType]  ]);
