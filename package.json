@@ -1,0 +1,23 @@
+{
+  "name": "pdm_xml_parser",
+  "version": "0.0.1",
+  "description": "Модуль формирует xlsx файлы из данных в XML файлах структуры изделий выгруженных из PDM.",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/seredenkov/pdm_xml_parser.git"
+  },
+  "keywords": [
+    "PDM",
+    "parser"
+  ],
+  "author": "Seredenkov Alexandr <seredenkov@mail.ru>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/seredenkov/pdm_xml_parser/issues"
+  },
+  "homepage": "https://github.com/seredenkov/pdm_xml_parser"
+}
